@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import * as Y from 'yjs';
 import { DocumentSchema } from './schema';
 import { AwarenessManager, type AwarenessState } from './awareness';
@@ -27,6 +27,7 @@ export class WhiteboardStore {
   }
 
   connect(serverUrl: string, docId: string): void {
+    if (this.collabClient) return;
     this.collabClient = new CollaborationClient(serverUrl, docId, this);
     this.collabClient.connect();
   }
@@ -54,7 +55,6 @@ export class WhiteboardStore {
     };
   };
 
-  // Convenience methods
   addElement = (element: WhiteboardElement): void => {
     this.doc.transact(() => {
       this.schema.addElement(element);
@@ -106,17 +106,27 @@ export function useWhiteboardStore(): WhiteboardStore {
   if (!globalStore) {
     const userId = `user_${nanoid(8)}`;
     globalStore = new WhiteboardStore(userId);
-    globalStore.connect(getWsUrl(), 'default');
   }
   return globalStore;
 }
 
 export function useStoreSnapshot() {
   const store = useWhiteboardStore();
-  return useSyncExternalStore(
-    useCallback((cb: () => void) => store.subscribe(cb), [store]),
-    store.getSnapshot,
-  );
+  const [snapshot, setSnapshot] = useState(store.getSnapshot());
+
+  useEffect(() => {
+    // Connect on mount
+    store.connect(getWsUrl(), 'default');
+
+    // Subscribe to changes
+    const unsub = store.subscribe(() => {
+      setSnapshot(store.getSnapshot());
+    });
+
+    return unsub;
+  }, [store]);
+
+  return snapshot;
 }
 
 export function useElements(): WhiteboardElement[] {
@@ -140,9 +150,10 @@ export function useRemoteUsers(): AwarenessState[] {
 
   useEffect(() => {
     return store.awareness.onChange((newStates) => {
-      setStates(newStates);
+      setStates(new Map(newStates));
     });
   }, [store]);
 
-  return Array.from(states.values()).filter(s => s.userId !== store.awareness.localState.userId);
+  const localId = store.awareness.localState.userId;
+  return Array.from(states.values()).filter(s => s.userId !== localId);
 }

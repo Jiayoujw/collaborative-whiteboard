@@ -26,6 +26,30 @@ const MIME_TYPES: Record<string, string> = {
   '.woff2': 'font/woff2',
 };
 
+function serveStatic(reqUrl: string, res: any): void {
+  const url = reqUrl.split('?')[0];
+  let filePath = join(STATIC_DIR, url === '/' ? 'index.html' : url);
+
+  // SPA fallback - if file doesn't exist, serve index.html
+  if (!existsSync(filePath)) {
+    filePath = join(STATIC_DIR, 'index.html');
+  }
+
+  try {
+    const ext = extname(filePath);
+    const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
+    const content = readFileSync(filePath);
+    res.writeHead(200, {
+      'Content-Type': mimeType,
+      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000',
+    });
+    res.end(content);
+  } catch {
+    res.writeHead(404);
+    res.end('Not found');
+  }
+}
+
 const httpServer = createServer((req, res) => {
   const url = req.url || '/';
 
@@ -36,33 +60,14 @@ const httpServer = createServer((req, res) => {
     return;
   }
 
-  // Serve static files in production
-  if (IS_PRODUCTION && url !== '/' && !url.startsWith('/ws')) {
-    let filePath = join(STATIC_DIR, url === '/' ? 'index.html' : url);
-
-    // SPA fallback - if file doesn't exist, serve index.html
-    if (!existsSync(filePath)) {
-      filePath = join(STATIC_DIR, 'index.html');
-    }
-
-    try {
-      const ext = extname(filePath);
-      const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
-      const content = readFileSync(filePath);
-      res.writeHead(200, {
-        'Content-Type': mimeType,
-        'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000',
-      });
-      res.end(content);
-      return;
-    } catch {
-      res.writeHead(404);
-      res.end('Not found');
-      return;
-    }
+  // In production: serve static files for all HTTP requests
+  // (WebSocket upgrade is handled separately by ws library)
+  if (IS_PRODUCTION) {
+    serveStatic(url, res);
+    return;
   }
 
-  // Default response
+  // Development fallback
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ status: 'ok', name: 'Whiteboard Sync Server', version: '1.0.0' }));
 });
