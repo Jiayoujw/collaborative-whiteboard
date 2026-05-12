@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: collaborative-whiteboard
+    env: node
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @whiteboard/web build
+    startCommand: cd server && node --import tsx src/index.ts
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+    plan: free

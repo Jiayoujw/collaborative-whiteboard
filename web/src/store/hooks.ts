@@ -92,13 +92,21 @@ export class WhiteboardStore {
   };
 }
 
+function getWsUrl(): string {
+  if (typeof window !== 'undefined') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}`;
+  }
+  return 'ws://localhost:8080';
+}
+
 let globalStore: WhiteboardStore | null = null;
 
 export function useWhiteboardStore(): WhiteboardStore {
   if (!globalStore) {
     const userId = `user_${nanoid(8)}`;
     globalStore = new WhiteboardStore(userId);
-    globalStore.connect('ws://localhost:8080', 'default');
+    globalStore.connect(getWsUrl(), 'default');
   }
   return globalStore;
 }
