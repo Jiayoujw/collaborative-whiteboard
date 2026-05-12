@@ -10,7 +10,9 @@ import { WS_PORT } from '@whiteboard/shared';
 const PORT = parseInt(process.env.PORT || '') || WS_PORT;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-const STATIC_DIR = join(process.cwd(), 'public');
+const STATIC_DIR = IS_PRODUCTION
+  ? join(process.cwd(), 'web', 'dist')
+  : join(process.cwd(), 'public');
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html',
