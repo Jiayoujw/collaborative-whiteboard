@@ -14,11 +14,11 @@
     "yjs": "^13.6.15",
     "y-websocket": "^2.0.4",
     "lib0": "^0.2.88",
-    "nanoid": "^5.0.7"
+    "nanoid": "^5.0.7",
+    "tsx": "^4.10.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.10",
-    "tsx": "^4.10.0",
     "typescript": "^5.4.0"
   }
 }

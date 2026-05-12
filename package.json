@@ -8,6 +8,7 @@
     "web": "pnpm --filter @whiteboard/web dev",
     "deploy": "pnpm build && pnpm --filter @whiteboard/server deploy"
   },
+  "packageManager": "pnpm@9.15.0",
   "devDependencies": {
     "concurrently": "^8.2.2",
     "typescript": "^5.4.0"
