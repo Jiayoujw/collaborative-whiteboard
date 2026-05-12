@@ -1,0 +1,15 @@
+{
+  "name": "collaborative-whiteboard",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @whiteboard/server dev\" \"pnpm --filter @whiteboard/web dev\"",
+    "build": "pnpm --filter @whiteboard/shared build && pnpm --filter @whiteboard/web build && pnpm --filter @whiteboard/server build",
+    "server": "pnpm --filter @whiteboard/server dev",
+    "web": "pnpm --filter @whiteboard/web dev",
+    "deploy": "pnpm build && pnpm --filter @whiteboard/server deploy"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.0"
+  }
+}

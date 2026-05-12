@@ -1,0 +1,24 @@
+{
+  "name": "@whiteboard/server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "deploy": "echo 'Deploy ready - run: node dist/index.js'"
+  },
+  "dependencies": {
+    "@whiteboard/shared": "workspace:*",
+    "ws": "^8.17.0",
+    "yjs": "^13.6.15",
+    "y-websocket": "^2.0.4",
+    "lib0": "^0.2.88",
+    "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.10.0",
+    "typescript": "^5.4.0"
+  }
+}
