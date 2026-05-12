@@ -2,7 +2,7 @@ services:
   - type: web
     name: collaborative-whiteboard
     runtime: node
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @whiteboard/web build
+    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @whiteboard/web build
     startCommand: NODE_ENV=production cd server && npx tsx src/index.ts
     envVars:
       - key: PORT
